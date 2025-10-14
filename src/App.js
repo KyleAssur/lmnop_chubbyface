@@ -14,6 +14,12 @@ import UserDashboard from "./components/Dashboard/UserDashboard";
 import CourseList from "./components/Courses/CourseList";
 import EnrollmentForm from "./components/Enrollment/EnrollmentForm";
 import AdminRegister from './components/Auth/AdminRegister';
+import Quizzes from "./pages/Quizzes";
+import Quiz1 from "./pages/Quiz1";
+import Quiz2 from "./pages/Quiz2";
+import Quiz3 from "./pages/Quiz3";
+import Quiz4 from "./pages/Quiz4";
+import Quiz5 from "./pages/Quiz5";
 import "./styles/App.css";
 
 function App() {
@@ -89,6 +95,14 @@ function App() {
           </Routes>
         )}
       </div>
+      <Routes>
+        <Route path="/quizzes" element={<Quizzes />} />
+        <Route path="/quiz1" element={<Quiz1 />} />
+        <Route path="/quiz2" element={<Quiz2 />} />
+        <Route path="/quiz3" element={<Quiz3 />} />
+        <Route path="/quiz4" element={<Quiz4 />} />
+        <Route path="/quiz5" element={<Quiz5 />} />
+      </Routes>
     </Router>
   );
 }
