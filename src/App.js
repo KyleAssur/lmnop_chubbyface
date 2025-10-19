@@ -20,32 +20,79 @@ import Quiz2 from "./pages/Quiz2";
 import Quiz3 from "./pages/Quiz3";
 import Quiz4 from "./pages/Quiz4";
 import Quiz5 from "./pages/Quiz5";
+import { authUtils } from "./services/api";
 import "./styles/App.css";
+
+// Protected Route Component
+const ProtectedRoute = ({ children, requiredRole }) => {
+  const isAuthenticated = authUtils.isAuthenticated();
+  const user = authUtils.getCurrentUser();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (requiredRole && user.role !== requiredRole) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
+// Public Route Component (redirect to dashboard if already authenticated)
+const PublicRoute = ({ children }) => {
+  const isAuthenticated = authUtils.isAuthenticated();
+
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
 
 function App() {
   const [user, setUser] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    // Check if user is logged in on app start
+    const initializeAuth = () => {
+      const isAuthenticated = authUtils.isAuthenticated();
+      if (isAuthenticated) {
+        const userData = authUtils.getCurrentUser();
+        setUser(userData);
+      }
+      setLoading(false);
+    };
+
+    initializeAuth();
   }, []);
 
-  const handleLogin = (userData) => {
+  const handleLogin = (userData, token) => {
     setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
+    // Token is already stored in localStorage by the Login component
   };
 
   const handleLogout = () => {
     setUser(null);
-    localStorage.removeItem("user");
+    authUtils.logout(); // This will clear storage and redirect
   };
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
+  if (loading) {
+    return (
+        <div className="app-loading">
+          <div className="loading-spinner">
+            <i className="fas fa-spinner fa-spin"></i>
+            <p>Loading...</p>
+          </div>
+        </div>
+    );
+  }
 
   return (
       <Router>
@@ -69,20 +116,80 @@ function App() {
                           path="/"
                           element={
                             user.role === "ADMIN" ? (
-                                <AdminDashboard />
+                                <ProtectedRoute requiredRole="ADMIN">
+                                  <AdminDashboard />
+                                </ProtectedRoute>
                             ) : (
-                                <UserDashboard />
+                                <ProtectedRoute>
+                                  <UserDashboard />
+                                </ProtectedRoute>
                             )
                           }
                       />
-                      <Route path="/courses" element={<CourseList />} />
-                      <Route path="/enroll" element={<EnrollmentForm />} />
-                      <Route path="/quizzes" element={<Quizzes />} />
-                      <Route path="/quiz1" element={<Quiz1 />} />
-                      <Route path="/quiz2" element={<Quiz2 />} />
-                      <Route path="/quiz3" element={<Quiz3 />} />
-                      <Route path="/quiz4" element={<Quiz4 />} />
-                      <Route path="/quiz5" element={<Quiz5 />} />
+                      <Route
+                          path="/courses"
+                          element={
+                            <ProtectedRoute>
+                              <CourseList />
+                            </ProtectedRoute>
+                          }
+                      />
+                      <Route
+                          path="/enroll"
+                          element={
+                            <ProtectedRoute requiredRole="USER">
+                              <EnrollmentForm />
+                            </ProtectedRoute>
+                          }
+                      />
+                      <Route
+                          path="/quizzes"
+                          element={
+                            <ProtectedRoute>
+                              <Quizzes />
+                            </ProtectedRoute>
+                          }
+                      />
+                      <Route
+                          path="/quiz1"
+                          element={
+                            <ProtectedRoute>
+                              <Quiz1 />
+                            </ProtectedRoute>
+                          }
+                      />
+                      <Route
+                          path="/quiz2"
+                          element={
+                            <ProtectedRoute>
+                              <Quiz2 />
+                            </ProtectedRoute>
+                          }
+                      />
+                      <Route
+                          path="/quiz3"
+                          element={
+                            <ProtectedRoute>
+                              <Quiz3 />
+                            </ProtectedRoute>
+                          }
+                      />
+                      <Route
+                          path="/quiz4"
+                          element={
+                            <ProtectedRoute>
+                              <Quiz4 />
+                            </ProtectedRoute>
+                          }
+                      />
+                      <Route
+                          path="/quiz5"
+                          element={
+                            <ProtectedRoute>
+                              <Quiz5 />
+                            </ProtectedRoute>
+                          }
+                      />
                       <Route path="*" element={<Navigate to="/" />} />
                     </Routes>
                   </div>
@@ -90,12 +197,30 @@ function App() {
               </>
           ) : (
               <Routes>
-                <Route path="/login" element={<Login onLogin={handleLogin} />} />
+                <Route
+                    path="/login"
+                    element={
+                      <PublicRoute>
+                        <Login onLogin={handleLogin} />
+                      </PublicRoute>
+                    }
+                />
                 <Route
                     path="/register"
-                    element={<Register onRegister={handleLogin} />}
+                    element={
+                      <PublicRoute>
+                        <Register onRegister={handleLogin} />
+                      </PublicRoute>
+                    }
                 />
-                <Route path="/admin-register" element={<AdminRegister />} />
+                <Route
+                    path="/admin-register"
+                    element={
+                      <PublicRoute>
+                        <AdminRegister />
+                      </PublicRoute>
+                    }
+                />
                 <Route path="*" element={<Navigate to="/login" />} />
               </Routes>
           )}
