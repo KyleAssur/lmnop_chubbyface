@@ -27,7 +27,6 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
@@ -49,61 +48,59 @@ function App() {
   };
 
   return (
-    <Router>
-      <div className="app">
-        {user ? (
-          <>
-            <Sidebar
-              isOpen={isSidebarOpen}
-              user={user}
-              onLogout={handleLogout}
-            />
-            <div
-              className={`main-content ${
-                isSidebarOpen ? "sidebar-open" : "sidebar-closed"
-              }`}
-            >
-              <Header onToggleSidebar={toggleSidebar} user={user} />
-              <div className="content">
-                <Routes>
-                  <Route
-                    path="/"
-                    element={
-                      user.role === "ADMIN" ? (
-                        <AdminDashboard />
-                      ) : (
-                        <UserDashboard />
-                      )
-                    }
-                  />
-                  <Route path="/courses" element={<CourseList />} />
-                  <Route path="/enroll" element={<EnrollmentForm />} />
-                  <Route path="*" element={<Navigate to="/" />} />
-                </Routes>
-              </div>
-            </div>
-          </>
-        ) : (
-          <Routes>
-            <Route path="/login" element={<Login onLogin={handleLogin} />} />
-            <Route
-              path="/register"
-              element={<Register onRegister={handleLogin} />}
-            />
-            <Route path="/admin-register" element={<AdminRegister />} />
-            <Route path="*" element={<Navigate to="/login" />} />
-          </Routes>
-        )}
-      </div>
-      <Routes>
-        <Route path="/quizzes" element={<Quizzes />} />
-        <Route path="/quiz1" element={<Quiz1 />} />
-        <Route path="/quiz2" element={<Quiz2 />} />
-        <Route path="/quiz3" element={<Quiz3 />} />
-        <Route path="/quiz4" element={<Quiz4 />} />
-        <Route path="/quiz5" element={<Quiz5 />} />
-      </Routes>
-    </Router>
+      <Router>
+        <div className="app">
+          {user ? (
+              <>
+                <Sidebar
+                    isOpen={isSidebarOpen}
+                    user={user}
+                    onLogout={handleLogout}
+                />
+                <div
+                    className={`main-content ${
+                        isSidebarOpen ? "sidebar-open" : "sidebar-closed"
+                    }`}
+                >
+                  <Header onToggleSidebar={toggleSidebar} user={user} />
+                  <div className="content">
+                    <Routes>
+                      <Route
+                          path="/"
+                          element={
+                            user.role === "ADMIN" ? (
+                                <AdminDashboard />
+                            ) : (
+                                <UserDashboard />
+                            )
+                          }
+                      />
+                      <Route path="/courses" element={<CourseList />} />
+                      <Route path="/enroll" element={<EnrollmentForm />} />
+                      <Route path="/quizzes" element={<Quizzes />} />
+                      <Route path="/quiz1" element={<Quiz1 />} />
+                      <Route path="/quiz2" element={<Quiz2 />} />
+                      <Route path="/quiz3" element={<Quiz3 />} />
+                      <Route path="/quiz4" element={<Quiz4 />} />
+                      <Route path="/quiz5" element={<Quiz5 />} />
+                      <Route path="*" element={<Navigate to="/" />} />
+                    </Routes>
+                  </div>
+                </div>
+              </>
+          ) : (
+              <Routes>
+                <Route path="/login" element={<Login onLogin={handleLogin} />} />
+                <Route
+                    path="/register"
+                    element={<Register onRegister={handleLogin} />}
+                />
+                <Route path="/admin-register" element={<AdminRegister />} />
+                <Route path="*" element={<Navigate to="/login" />} />
+              </Routes>
+          )}
+        </div>
+      </Router>
   );
 }
 

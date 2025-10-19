@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import quizData from '../data/QuizData';
-import '../styles/Quiz.css';
+import "../styles/App.css";
 
 const QuizTemplate = ({ quizId, title }) => {
     const [userAnswers, setUserAnswers] = useState({});
