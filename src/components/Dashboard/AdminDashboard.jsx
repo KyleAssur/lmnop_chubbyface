@@ -14,6 +14,7 @@ const AdminDashboard = () => {
     description: '',
     image: null
   });
+  const [imagePreview, setImagePreview] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -60,7 +61,19 @@ const AdminDashboard = () => {
   const handleCourseInputChange = (e) => {
     const { name, value, files } = e.target;
     if (name === 'image') {
-      setCourseForm({ ...courseForm, image: files[0] });
+      const file = files[0];
+      setCourseForm({ ...courseForm, image: file });
+
+      // Create preview
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setImagePreview(e.target.result);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setImagePreview('');
+      }
     } else {
       setCourseForm({ ...courseForm, [name]: value });
     }
@@ -69,9 +82,22 @@ const AdminDashboard = () => {
   const handleCourseSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
-    
+
     if (!courseForm.title || !courseForm.description || !courseForm.image) {
       setMessage('Please fill all fields including the image');
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (!allowedTypes.includes(courseForm.image.type)) {
+      setMessage('Please select a JPEG or PNG image file');
+      return;
+    }
+
+    // Validate file size (5MB max)
+    if (courseForm.image.size > 5 * 1024 * 1024) {
+      setMessage('Image size must be less than 5MB');
       return;
     }
 
@@ -81,14 +107,24 @@ const AdminDashboard = () => {
     formData.append('image', courseForm.image);
 
     try {
-      await courseAPI.create(formData);
+      console.log('Creating course with:', {
+        title: courseForm.title,
+        description: courseForm.description,
+        image: courseForm.image.name,
+        imageSize: courseForm.image.size
+      });
+
+      const response = await courseAPI.create(formData);
+      console.log('Course creation response:', response);
+
       setMessage('Course created successfully!');
       setCourseForm({ title: '', description: '', image: null });
+      setImagePreview('');
       setShowCourseForm(false);
       fetchData(); // Refresh courses list
     } catch (error) {
+      console.error('Course creation error:', error);
       setMessage('Failed to create course: ' + (error.response?.data?.message || error.message));
-      console.error('Error creating course:', error);
     }
   };
 
@@ -107,197 +143,225 @@ const AdminDashboard = () => {
     }
   };
 
+  const resetCourseForm = () => {
+    setCourseForm({ title: '', description: '', image: null });
+    setImagePreview('');
+    setShowCourseForm(false);
+  };
+
   if (loading) {
     return <div className="loading">Loading data...</div>;
   }
 
   return (
-    <div className="admin-dashboard">
-      <h1>Admin Dashboard</h1>
-      
-      {/* Navigation Tabs */}
-      <div className="admin-tabs">
-        <Button 
-          variant={activeTab === 'enrollments' ? 'primary' : 'secondary'}
-          onClick={() => setActiveTab('enrollments')}
-        >
-          Manage Enrollments
-        </Button>
-        <Button 
-          variant={activeTab === 'courses' ? 'primary' : 'secondary'}
-          onClick={() => setActiveTab('courses')}
-        >
-          Manage Courses
-        </Button>
-      </div>
+      <div className="admin-dashboard">
+        <h1>Admin Dashboard</h1>
 
-      {message && (
-        <div className={`message ${message.includes('success') ? 'success' : 'error'}`}>
-          {message}
+        {/* Navigation Tabs */}
+        <div className="admin-tabs">
+          <Button
+              variant={activeTab === 'enrollments' ? 'primary' : 'secondary'}
+              onClick={() => setActiveTab('enrollments')}
+          >
+            Manage Enrollments ({enrollments.filter(e => e.status === 'PENDING').length})
+          </Button>
+          <Button
+              variant={activeTab === 'courses' ? 'primary' : 'secondary'}
+              onClick={() => setActiveTab('courses')}
+          >
+            Manage Courses ({courses.length})
+          </Button>
         </div>
-      )}
 
-      {/* Enrollments Tab */}
-      {activeTab === 'enrollments' && (
-        <div className="enrollment-section">
-          <h2>Pending Enrollments</h2>
-          
-          {enrollments.length === 0 ? (
-            <p>No pending enrollments</p>
-          ) : (
-            <div className="enrollment-list">
-              {enrollments.map((enrollment) => (
-                <div key={enrollment.id} className="enrollment-card">
-                  <div className="enrollment-info">
-                    <h3>{enrollment.courseTitle}</h3>
-                    <p>
-                      <strong>Student:</strong> {enrollment.studentFirstName} {enrollment.studentLastName}
-                    </p>
-                    <p>
-                      <strong>Status:</strong> 
-                      <span className={`status status-${enrollment.status.toLowerCase()}`}>
+        {message && (
+            <div className={`message ${message.includes('success') ? 'success' : 'error'}`}>
+              {message}
+            </div>
+        )}
+
+        {/* Enrollments Tab */}
+        {activeTab === 'enrollments' && (
+            <div className="enrollment-section">
+              <h2>Pending Enrollments</h2>
+
+              {enrollments.length === 0 ? (
+                  <p>No enrollments found</p>
+              ) : (
+                  <div className="enrollment-list">
+                    {enrollments.map((enrollment) => (
+                        <div key={enrollment.id} className="enrollment-card">
+                          <div className="enrollment-info">
+                            <h3>{enrollment.courseTitle}</h3>
+                            <p>
+                              <strong>Student:</strong> {enrollment.studentFirstName} {enrollment.studentLastName}
+                            </p>
+                            <p>
+                              <strong>Status:</strong>
+                              <span className={`status status-${enrollment.status.toLowerCase()}`}>
                         {enrollment.status}
                       </span>
-                    </p>
-                    <p>
-                      <strong>Requested on:</strong> {new Date(enrollment.enrollmentDate).toLocaleDateString()}
-                    </p>
+                            </p>
+                            <p>
+                              <strong>Requested on:</strong> {enrollment.enrollmentDate ? new Date(enrollment.enrollmentDate).toLocaleDateString() : 'N/A'}
+                            </p>
+                          </div>
+
+                          {enrollment.status === 'PENDING' && (
+                              <div className="enrollment-actions">
+                                <Button
+                                    variant="success"
+                                    onClick={() => handleApprove(enrollment.id)}
+                                >
+                                  Approve
+                                </Button>
+                                <Button
+                                    variant="danger"
+                                    onClick={() => handleReject(enrollment.id)}
+                                >
+                                  Reject
+                                </Button>
+                              </div>
+                          )}
+                        </div>
+                    ))}
                   </div>
-                  
-                  {enrollment.status === 'PENDING' && (
-                    <div className="enrollment-actions">
-                      <Button 
-                        variant="success" 
-                        onClick={() => handleApprove(enrollment.id)}
-                      >
-                        Approve
-                      </Button>
-                      <Button 
-                        variant="danger" 
-                        onClick={() => handleReject(enrollment.id)}
-                      >
-                        Reject
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              ))}
+              )}
             </div>
-          )}
-        </div>
-      )}
+        )}
 
-      {/* Courses Tab */}
-      {activeTab === 'courses' && (
-        <div className="courses-section">
-          <div className="section-header">
-            <h2>Manage Courses</h2>
-            <Button 
-              variant="primary" 
-              onClick={() => setShowCourseForm(!showCourseForm)}
-            >
-              {showCourseForm ? 'Cancel' : 'Add New Course'}
-            </Button>
-          </div>
-
-          {/* Course Creation Form */}
-          {showCourseForm && (
-            <div className="course-form-container">
-              <form onSubmit={handleCourseSubmit} className="course-form">
-                <div className="form-group">
-                  <label htmlFor="title">Course Title</label>
-                  <input
-                    type="text"
-                    id="title"
-                    name="title"
-                    value={courseForm.title}
-                    onChange={handleCourseInputChange}
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="description">Description</label>
-                  <textarea
-                    id="description"
-                    name="description"
-                    value={courseForm.description}
-                    onChange={handleCourseInputChange}
-                    rows="4"
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="image">Course Image</label>
-                  <input
-                    type="file"
-                    id="image"
-                    name="image"
-                    accept="image/*"
-                    onChange={handleCourseInputChange}
-                    required
-                  />
-                </div>
-
-                <Button type="submit" variant="primary">
-                  Create Course
+        {/* Courses Tab */}
+        {activeTab === 'courses' && (
+            <div className="courses-section">
+              <div className="section-header">
+                <h2>Manage Courses</h2>
+                <Button
+                    variant="primary"
+                    onClick={() => setShowCourseForm(!showCourseForm)}
+                >
+                  {showCourseForm ? 'Cancel' : 'Add New Course'}
                 </Button>
-              </form>
-            </div>
-          )}
+              </div>
 
-          {/* Courses List */}
-          <div className="courses-list">
-            <h3>Existing Courses ({courses.length})</h3>
-            
-            {courses.length === 0 ? (
-              <p>No courses available</p>
-            ) : (
-              <div className="course-grid">
-                {courses.map((course) => (
-                  <div key={course.id} className="course-card">
-                    <div className="course-image">
-                      {course.image ? (
-                        <img 
-                          src={`http://localhost:8080/courses/media/${course.id}`} 
-                          alt={course.title}
-                          onError={(e) => {
-                            e.target.src = 'https://via.placeholder.com/300x200/112240/64ffda?text=Course+Image';
-                          }}
+              {/* Course Creation Form */}
+              {showCourseForm && (
+                  <div className="course-form-container">
+                    <form onSubmit={handleCourseSubmit} className="course-form">
+                      <div className="form-group">
+                        <label htmlFor="title">Course Title *</label>
+                        <input
+                            type="text"
+                            id="title"
+                            name="title"
+                            value={courseForm.title}
+                            onChange={handleCourseInputChange}
+                            required
+                            placeholder="Enter course title"
                         />
-                      ) : (
-                        <div className="image-placeholder">No Image</div>
-                      )}
-                    </div>
-                    
-                    <div className="course-content">
-                      <h4>{course.title}</h4>
-                      <p className="course-description">
-                        {course.description.length > 100 
-                          ? `${course.description.substring(0, 100)}...`
-                          : course.description
-                        }
-                      </p>
-                      
-                      <div className="course-actions">
-                        <Button 
-                          variant="danger" 
-                          onClick={() => handleDeleteCourse(course.id)}
-                          size="small"
-                        >
-                          Delete
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="description">Description *</label>
+                        <textarea
+                            id="description"
+                            name="description"
+                            value={courseForm.description}
+                            onChange={handleCourseInputChange}
+                            rows="4"
+                            required
+                            placeholder="Enter course description"
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="image">Course Image *</label>
+                        <input
+                            type="file"
+                            id="image"
+                            name="image"
+                            accept="image/jpeg, image/png, image/jpg"
+                            onChange={handleCourseInputChange}
+                            required
+                        />
+                        <small>Only JPEG and PNG files allowed (max 5MB)</small>
+
+                        {imagePreview && (
+                            <div className="image-preview">
+                              <img src={imagePreview} alt="Preview" />
+                              <p>Image Preview</p>
+                            </div>
+                        )}
+                      </div>
+
+                      <div className="form-actions">
+                        <Button type="submit" variant="primary">
+                          Create Course
+                        </Button>
+                        <Button type="button" onClick={resetCourseForm} variant="secondary">
+                          Cancel
                         </Button>
                       </div>
-                    </div>
+                    </form>
                   </div>
-                ))}
+              )}
+
+              {/* Courses List */}
+              <div className="courses-list">
+                <h3>Existing Courses ({courses.length})</h3>
+
+                {courses.length === 0 ? (
+                    <p>No courses available. Create your first course!</p>
+                ) : (
+                    <div className="course-grid">
+                      {courses.map((course) => (
+                          <div key={course.id} className="course-card">
+                            <div className="course-image">
+                              {course.image ? (
+                                  <img
+                                      src={`http://localhost:8080/courses/media/${course.id}`}
+                                      alt={course.title}
+                                      onError={(e) => {
+                                        e.target.src = 'https://via.placeholder.com/300x200/112240/64ffda?text=Course+Image';
+                                      }}
+                                  />
+                              ) : (
+                                  <div className="image-placeholder">No Image</div>
+                              )}
+                            </div>
+
+                            <div className="course-content">
+                              <h4>{course.title}</h4>
+                              <p className="course-description">
+                                {course.description && course.description.length > 100
+                                    ? `${course.description.substring(0, 100)}...`
+                                    : course.description || 'No description available'
+                                }
+                              </p>
+
+                              <div className="course-actions">
+                                <Button
+                                    variant="warning"
+                                    onClick={() => window.location.href = `/course/update/${course.id}`}
+                                    size="small"
+                                >
+                                  Edit
+                                </Button>
+                                <Button
+                                    variant="danger"
+                                    onClick={() => handleDeleteCourse(course.id)}
+                                    size="small"
+                                >
+                                  Delete
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                      ))}
+                    </div>
+                )}
               </div>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
+            </div>
+        )}
+      </div>
   );
 };
 

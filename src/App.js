@@ -12,6 +12,7 @@ import Register from "./components/Auth/Register";
 import AdminDashboard from "./components/Dashboard/AdminDashboard";
 import UserDashboard from "./components/Dashboard/UserDashboard";
 import CourseList from "./components/Courses/CourseList";
+import CourseUpdate from "./components/Courses/CourseUpdate";
 import EnrollmentForm from "./components/Enrollment/EnrollmentForm";
 import AdminRegister from './components/Auth/AdminRegister';
 import Quizzes from "./pages/Quizzes";
@@ -131,6 +132,14 @@ function App() {
                           element={
                             <ProtectedRoute>
                               <CourseList />
+                            </ProtectedRoute>
+                          }
+                      />
+                      <Route
+                          path="/course/update/:id"
+                          element={
+                            <ProtectedRoute requiredRole="ADMIN">
+                              <CourseUpdate />
                             </ProtectedRoute>
                           }
                       />

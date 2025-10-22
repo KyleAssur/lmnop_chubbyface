@@ -63,7 +63,7 @@ export const adminAPI = {
   getProfile: () => api.get('/admins/profile'),
 };
 
-// Course endpoints
+// Course endpoints - FIXED
 export const courseAPI = {
   create: (formData) => api.post('/courses/create', formData, {
     headers: {
@@ -72,18 +72,25 @@ export const courseAPI = {
   }),
   getAll: () => api.get('/courses/all'),
   getById: (id) => api.get(`/courses/${id}`),
-  update: (courseData) => api.put('/courses/update', courseData),
+  update: (formData) => api.put('/courses/update', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
   delete: (id) => api.delete(`/courses/delete/${id}`),
-  getImage: (id) => api.get(`/courses/media/${id}`, { responseType: 'blob' }),
+  getImage: (id) => `${API_BASE_URL}/courses/media/${id}`,
 };
 
-// Enrollment endpoints
+// Enrollment endpoints - FIXED
 export const enrollmentAPI = {
   enroll: (enrollmentData) => api.post('/api/enrollments/enroll', enrollmentData),
   getAll: () => api.get('/api/enrollments'),
   getById: (id) => api.get(`/api/enrollments/${id}`),
   approve: (id) => api.put(`/api/enrollments/${id}/approve`),
   reject: (id) => api.put(`/api/enrollments/${id}/reject`),
+  getByCustomer: (customerId) => api.get(`/api/enrollments/customer/${customerId}`),
+  getByCourse: (courseId) => api.get(`/api/enrollments/course/${courseId}`),
+  getByStatus: (status) => api.get(`/api/enrollments/status/${status}`),
 };
 
 // Quiz endpoints
