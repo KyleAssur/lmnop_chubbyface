@@ -112,6 +112,23 @@ export const supportAPI = {
   update: (supportData) => api.post('/api/update', supportData),
 };
 
+// User Management endpoints - UPDATED with update functionality
+export const userManagementAPI = {
+  // User endpoints
+  createUser: (userData) => api.post('/api/users/create-user', userData),
+  createAdmin: (adminData) => api.post('/api/users/create-admin', adminData),
+  getAllUsers: () => api.get('/api/users'),
+  getAllAdmins: () => api.get('/api/users/admins'),
+  getUserById: (id) => api.get(`/api/users/${id}`),
+
+  // UPDATE ENDPOINTS - ADDED
+  updateUser: (id, userData) => api.put(`/api/users/${id}`, userData),
+  updateAdmin: (id, adminData) => api.put(`/api/users/${id}`, adminData),
+
+  deleteUser: (id) => api.delete(`/api/users/${id}`),
+  checkEmail: (email) => api.get(`/api/users/check-email?email=${email}`),
+};
+
 // Auth utility functions
 export const authUtils = {
   isAuthenticated: () => {

@@ -1587,4 +1587,366 @@ body {
   .admin-actions {
     flex-direction: column;
   }
+
+  /* User Management Styles */
+  .user-management {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .user-management h1 {
+    color: #64ffda;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .users-section,
+  .admins-section {
+    background-color: #112240;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #233554;
+  }
+
+  .section-header h2 {
+    color: #e6f1ff;
+    margin: 0;
+  }
+
+  .user-form-container,
+  .admin-form-container {
+    background-color: #0a192f;
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    border: 1px solid #233554;
+  }
+
+  .user-form,
+  .admin-form {
+    max-width: 600px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 15px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #e6f1ff;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #233554;
+    border-radius: 6px;
+    background-color: #112240;
+    color: #e6f1ff;
+    font-size: 14px;
+    transition: all 0.3s ease;
+  }
+
+  .form-group input:focus {
+    outline: none;
+    border-color: #64ffda;
+    box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.2);
+  }
+
+  .form-group input::placeholder {
+    color: #8892b0;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+  }
+
+  /* Table Styles */
+  .table-container {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #233554;
+  }
+
+  .users-table,
+  .admins-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #0a192f;
+  }
+
+  .users-table th,
+  .admins-table th,
+  .users-table td,
+  .admins-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #233554;
+  }
+
+  .users-table th,
+  .admins-table th {
+    background-color: #112240;
+    font-weight: 600;
+    color: #64ffda;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .users-table td,
+  .admins-table td {
+    color: #8892b0;
+    font-size: 0.95rem;
+  }
+
+  .users-table tr:hover,
+  .admins-table tr:hover {
+    background-color: rgba(100, 255, 218, 0.05);
+  }
+
+  .users-table tr:last-child td,
+  .admins-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Role Badge Styles */
+  .role-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .role-user {
+    background-color: rgba(100, 255, 218, 0.1);
+    color: #64ffda;
+    border: 1px solid rgba(100, 255, 218, 0.3);
+  }
+
+  .role-admin {
+    background-color: rgba(255, 107, 107, 0.1);
+    color: #ff6b6b;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+  }
+
+  /* Status Dropdown Styles */
+  .status-dropdown {
+    margin-top: 10px;
+  }
+
+  .status-dropdown label {
+    display: block;
+    margin-bottom: 5px;
+    color: #8892b0;
+    font-size: 0.9rem;
+  }
+
+  .status-dropdown select {
+    padding: 8px 12px;
+    border: 1px solid #233554;
+    border-radius: 4px;
+    background-color: #0a192f;
+    color: #e6f1ff;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .status-dropdown select:focus {
+    outline: none;
+    border-color: #64ffda;
+  }
+
+  .status-dropdown select option {
+    background-color: #112240;
+    color: #e6f1ff;
+    padding: 10px;
+  }
+
+  /* Button Variants */
+  .btn-warning {
+    background-color: #ffb142;
+    color: #0a192f;
+  }
+
+  .btn-warning:hover {
+    background-color: #ff9f1a;
+  }
+
+  .btn-outline {
+    background-color: transparent;
+    border: 1px solid #64ffda;
+    color: #64ffda;
+  }
+
+  .btn-outline:hover {
+    background-color: rgba(100, 255, 218, 0.1);
+  }
+
+  /* Loading and Empty States */
+  .user-management .loading {
+    text-align: center;
+    padding: 40px;
+    color: #64ffda;
+    font-size: 1.1rem;
+  }
+
+  .users-list h3,
+  .admins-list h3 {
+    color: #e6f1ff;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+  }
+
+  .users-list p,
+  .admins-list p {
+    color: #8892b0;
+    text-align: center;
+    padding: 30px;
+    font-style: italic;
+  }
+
+  /* Responsive Design for User Management */
+  @media (max-width: 768px) {
+    .user-management {
+      padding: 15px;
+    }
+
+    .section-header {
+      flex-direction: column;
+      gap: 15px;
+      align-items: flex-start;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+
+    .form-actions {
+      flex-direction: column;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+
+    .users-table,
+    .admins-table {
+      font-size: 0.85rem;
+    }
+
+    .users-table th,
+    .admins-table th,
+    .users-table td,
+    .admins-table td {
+      padding: 10px 8px;
+    }
+
+    .table-container {
+      border-radius: 6px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .users-section,
+    .admins-section {
+      padding: 15px;
+    }
+
+    .user-form-container,
+    .admin-form-container {
+      padding: 15px;
+    }
+
+    .form-group input {
+      padding: 10px;
+    }
+
+    .role-badge {
+      font-size: 0.7rem;
+      padding: 4px 8px;
+    }
+  }
+
+  /* Animation for form appearance */
+  .user-form-container,
+  .admin-form-container {
+    animation: slideDown 0.3s ease-out;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Enhanced button styles for user management */
+  .btn-small {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+
+  /* Focus states for accessibility */
+  .form-group input:focus,
+  .status-dropdown select:focus,
+  .btn:focus {
+    outline: 2px solid #64ffda;
+    outline-offset: 2px;
+  }
+
+  /* Success message enhancements */
+  .message.success {
+    background-color: rgba(100, 255, 218, 0.1);
+    color: #64ffda;
+    border-left: 3px solid #64ffda;
+    padding: 12px 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+  }
+
+  .message.error {
+    background-color: rgba(255, 107, 107, 0.1);
+    color: #ff6b6b;
+    border-left: 3px solid #ff6b6b;
+    padding: 12px 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+  }
 }

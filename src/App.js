@@ -21,6 +21,7 @@ import Quiz2 from "./pages/Quiz2";
 import Quiz3 from "./pages/Quiz3";
 import Quiz4 from "./pages/Quiz4";
 import Quiz5 from "./pages/Quiz5";
+import UserManagement from "./components/Admin/UserManagement"; // NEW IMPORT
 import { authUtils } from "./services/api";
 import "./styles/App.css";
 
@@ -148,6 +149,15 @@ function App() {
                           element={
                             <ProtectedRoute requiredRole="USER">
                               <EnrollmentForm />
+                            </ProtectedRoute>
+                          }
+                      />
+                      {/* NEW USER MANAGEMENT ROUTE */}
+                      <Route
+                          path="/admin/users"
+                          element={
+                            <ProtectedRoute requiredRole="ADMIN">
+                              <UserManagement />
                             </ProtectedRoute>
                           }
                       />
