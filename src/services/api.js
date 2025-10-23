@@ -81,14 +81,16 @@ export const courseAPI = {
   getImage: (id) => `${API_BASE_URL}/courses/media/${id}`,
 };
 
-// Enrollment endpoints - FIXED
+// Enrollment endpoints - UPDATED with reset functionality
 export const enrollmentAPI = {
   enroll: (enrollmentData) => api.post('/api/enrollments/enroll', enrollmentData),
   getAll: () => api.get('/api/enrollments'),
   getById: (id) => api.get(`/api/enrollments/${id}`),
   approve: (id) => api.put(`/api/enrollments/${id}/approve`),
   reject: (id) => api.put(`/api/enrollments/${id}/reject`),
-  getByCustomer: (customerId) => api.get(`/api/enrollments/customer/${customerId}`),
+  reset: (id) => api.put(`/api/enrollments/${id}/reset`), // NEW
+  updateStatus: (id, status) => api.put(`/api/enrollments/${id}/status`, { status }), // NEW
+  getByStudent: (studentId) => api.get(`/api/enrollments/student/${studentId}`),
   getByCourse: (courseId) => api.get(`/api/enrollments/course/${courseId}`),
   getByStatus: (status) => api.get(`/api/enrollments/status/${status}`),
 };

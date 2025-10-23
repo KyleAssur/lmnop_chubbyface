@@ -58,6 +58,30 @@ const AdminDashboard = () => {
     }
   };
 
+  // NEW: Handle reset enrollment
+  const handleReset = async (id) => {
+    try {
+      await enrollmentAPI.reset(id);
+      setMessage('Enrollment reset to pending successfully');
+      fetchData(); // Refresh the list
+    } catch (error) {
+      setMessage('Failed to reset enrollment');
+      console.error('Error resetting enrollment:', error);
+    }
+  };
+
+  // NEW: Handle status change with dropdown
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      await enrollmentAPI.updateStatus(id, newStatus);
+      setMessage(`Enrollment status updated to ${newStatus.toLowerCase()} successfully`);
+      fetchData(); // Refresh the list
+    } catch (error) {
+      setMessage(`Failed to update enrollment status to ${newStatus}`);
+      console.error('Error updating enrollment status:', error);
+    }
+  };
+
   const handleCourseInputChange = (e) => {
     const { name, value, files } = e.target;
     if (name === 'image') {
@@ -149,6 +173,16 @@ const AdminDashboard = () => {
     setShowCourseForm(false);
   };
 
+  // Helper function to get status badge class
+  const getStatusClass = (status) => {
+    switch (status) {
+      case 'PENDING': return 'status-pending';
+      case 'APPROVED': return 'status-approved';
+      case 'REJECTED': return 'status-rejected';
+      default: return 'status-pending';
+    }
+  };
+
   if (loading) {
     return <div className="loading">Loading data...</div>;
   }
@@ -182,7 +216,7 @@ const AdminDashboard = () => {
         {/* Enrollments Tab */}
         {activeTab === 'enrollments' && (
             <div className="enrollment-section">
-              <h2>Pending Enrollments</h2>
+              <h2>Enrollment Management</h2>
 
               {enrollments.length === 0 ? (
                   <p>No enrollments found</p>
@@ -197,31 +231,61 @@ const AdminDashboard = () => {
                             </p>
                             <p>
                               <strong>Status:</strong>
-                              <span className={`status status-${enrollment.status.toLowerCase()}`}>
-                        {enrollment.status}
-                      </span>
+                              <span className={`status ${getStatusClass(enrollment.status)}`}>
+                                {enrollment.status}
+                              </span>
                             </p>
                             <p>
                               <strong>Requested on:</strong> {enrollment.enrollmentDate ? new Date(enrollment.enrollmentDate).toLocaleDateString() : 'N/A'}
                             </p>
                           </div>
 
-                          {enrollment.status === 'PENDING' && (
-                              <div className="enrollment-actions">
+                          <div className="enrollment-actions">
+                            {/* Quick Action Buttons */}
+                            {enrollment.status === 'PENDING' && (
+                                <>
+                                  <Button
+                                      variant="success"
+                                      onClick={() => handleApprove(enrollment.id)}
+                                      size="small"
+                                  >
+                                    Approve
+                                  </Button>
+                                  <Button
+                                      variant="danger"
+                                      onClick={() => handleReject(enrollment.id)}
+                                      size="small"
+                                  >
+                                    Reject
+                                  </Button>
+                                </>
+                            )}
+
+                            {/* Reset Button for Approved/Rejected enrollments */}
+                            {(enrollment.status === 'APPROVED' || enrollment.status === 'REJECTED') && (
                                 <Button
-                                    variant="success"
-                                    onClick={() => handleApprove(enrollment.id)}
+                                    variant="warning"
+                                    onClick={() => handleReset(enrollment.id)}
+                                    size="small"
                                 >
-                                  Approve
+                                  Reset to Pending
                                 </Button>
-                                <Button
-                                    variant="danger"
-                                    onClick={() => handleReject(enrollment.id)}
-                                >
-                                  Reject
-                                </Button>
-                              </div>
-                          )}
+                            )}
+
+                            {/* Status Dropdown for All Enrollments */}
+                            <div className="status-dropdown">
+                              <label htmlFor={`status-${enrollment.id}`}>Change Status:</label>
+                              <select
+                                  id={`status-${enrollment.id}`}
+                                  value={enrollment.status}
+                                  onChange={(e) => handleStatusChange(enrollment.id, e.target.value)}
+                              >
+                                <option value="PENDING">Pending</option>
+                                <option value="APPROVED">Approved</option>
+                                <option value="REJECTED">Rejected</option>
+                              </select>
+                            </div>
+                          </div>
                         </div>
                     ))}
                   </div>
